@@ -4440,7 +4440,7 @@ OMX_ERRORTYPE omx_video::get_supported_profile_level(OMX_VIDEO_PARAM_PROFILELEVE
                     profileLevelType->eProfile,profileLevelType->eLevel);
   return eRet;
 }
-
+#endif
 #ifdef USE_ION
 int omx_video::alloc_map_ion_memory(int size,struct ion_allocation_data *alloc_data,
                                     struct ion_fd_data *fd_data,int flag)
@@ -4474,8 +4474,12 @@ int omx_video::alloc_map_ion_memory(int size,struct ion_allocation_data *alloc_d
         if (secure_session)
            alloc_data->heap_mask = (ION_HEAP(MEM_HEAP_ID) | ION_SECURE);
         else
+#ifdef MAX_RES_720P
+           alloc_data->heap_mask = ION_HEAP(MEM_HEAP_ID);
+#else
            alloc_data->heap_mask = (ION_HEAP(MEM_HEAP_ID) |
                 ION_HEAP(ION_IOMMU_HEAP_ID));
+#endif
 
         pthread_mutex_lock(&m_venc_ionlock);
         rc = ioctl(ion_device_fd,ION_IOC_ALLOC,alloc_data);
@@ -4533,7 +4537,6 @@ void omx_video::free_ion_memory(struct venc_ion *buf_ion_info)
      buf_ion_info->fd_ion_data.fd = -1;
      pthread_mutex_unlock(&m_venc_ionlock);
 }
-#endif
 #endif
 #ifdef _ANDROID_ICS_
 void omx_video::omx_release_meta_buffer(OMX_BUFFERHEADERTYPE *buffer)
