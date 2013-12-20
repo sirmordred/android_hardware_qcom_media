@@ -3093,6 +3093,9 @@ OMX_ERRORTYPE  omx_vdec::get_parameter(OMX_IN OMX_HANDLETYPE     hComp,
                 } else {
                         DEBUG_PRINT_HIGH("get_parameter: CACHED buffers from IOMMU heap");
                         nativeBuffersUsage->nUsage = (GRALLOC_USAGE_PRIVATE_IOMMU_HEAP);
+#ifdef NO_IOMMU
+                        nativeBuffersUsage->nUsage |= GRALLOC_USAGE_PRIVATE_MM_HEAP;
+#endif
                 }
 #endif //(MAX_RES_720P)
 #else
@@ -8103,6 +8106,9 @@ int omx_vdec::alloc_map_ion_memory(OMX_U32 buffer_size,
       alloc_data->flags |= ION_SECURE;
     } else if (external_meta_buffer_iommu) {
       alloc_data->heap_mask = ION_HEAP(ION_IOMMU_HEAP_ID);
+#ifdef NO_IOMMU
+      alloc_data->heap_mask |= ION_HEAP(MEM_HEAP_ID);
+#endif
     } else {
       alloc_data->heap_mask = ION_HEAP(MEM_HEAP_ID);
       alloc_data->flags |= ION_SECURE;
@@ -8112,6 +8118,9 @@ int omx_vdec::alloc_map_ion_memory(OMX_U32 buffer_size,
     alloc_data->heap_mask = ION_HEAP(MEM_HEAP_ID);
 #else
     alloc_data->heap_mask = (ION_HEAP(ION_IOMMU_HEAP_ID));
+#ifdef NO_IOMMU
+      alloc_data->heap_mask |= ION_HEAP(MEM_HEAP_ID);
+#endif
 #endif
   }
   pthread_mutex_lock(&m_vdec_ionlock);
