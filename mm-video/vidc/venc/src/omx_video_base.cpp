@@ -4477,12 +4477,12 @@ int omx_video::alloc_map_ion_memory(int size,struct ion_allocation_data *alloc_d
         }
 
         if (secure_session)
-           alloc_data->heap_mask = (ION_HEAP(MEM_HEAP_ID) | ION_SECURE);
+           alloc_data->heap_id_mask = (ION_HEAP(MEM_HEAP_ID) | ION_SECURE);
         else
 #ifdef MAX_RES_720P
-           alloc_data->heap_mask = ION_HEAP(MEM_HEAP_ID);
+           alloc_data->heap_id_mask = ION_HEAP(MEM_HEAP_ID);
 #else
-           alloc_data->heap_mask = (ION_HEAP(MEM_HEAP_ID) |
+           alloc_data->heap_id_mask = (ION_HEAP(MEM_HEAP_ID) |
                 ION_HEAP(ION_IOMMU_HEAP_ID));
 #endif
 
@@ -4503,9 +4503,9 @@ int omx_video::alloc_map_ion_memory(int size,struct ion_allocation_data *alloc_d
             goto error_case;
         }
         DEBUG_PRINT_HIGH("ion_alloc: device_fd = %d, len = %d, align = %d, "
-           "flags = 0x%x, heap_mask = 0x%x, handle = %p, fd = %d", ion_device_fd,
+           "flags = 0x%x, heap_id_mask = 0x%x, handle = %p, fd = %d", ion_device_fd,
            alloc_data->len, alloc_data->align, alloc_data->flags,
-           alloc_data->heap_mask, fd_data->handle, fd_data->fd);
+           alloc_data->heap_id_mask, fd_data->handle, fd_data->fd);
         pthread_mutex_unlock(&m_venc_ionlock);
         return ion_device_fd;
 

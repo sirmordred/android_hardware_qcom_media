@@ -472,7 +472,7 @@ void *get_omx_component_factory_fn(void)
 #ifdef _ANDROID_
 #ifdef USE_ION
 VideoHeap::VideoHeap(int devicefd, size_t size, void* base,
-                     struct ion_handle *handle, int ionMapfd)
+                     ion_user_handle_t handle, int ionMapfd)
 {
     m_ion_device_fd = devicefd;
     m_ion_handle = handle;
@@ -8105,24 +8105,24 @@ int omx_vdec::alloc_map_ion_memory(OMX_U32 buffer_size,
 
   if(secure_mode) {
     if(external_meta_buffer) {
-      alloc_data->heap_mask = ION_HEAP(ION_CP_MFC_HEAP_ID);
+      alloc_data->heap_id_mask = ION_HEAP(ION_CP_MFC_HEAP_ID);
       alloc_data->flags |= ION_SECURE;
     } else if (external_meta_buffer_iommu) {
-      alloc_data->heap_mask = ION_HEAP(ION_IOMMU_HEAP_ID);
+      alloc_data->heap_id_mask = ION_HEAP(ION_IOMMU_HEAP_ID);
 #ifdef NO_IOMMU
-      alloc_data->heap_mask |= ION_HEAP(MEM_HEAP_ID);
+      alloc_data->heap_id_mask |= ION_HEAP(MEM_HEAP_ID);
 #endif
     } else {
-      alloc_data->heap_mask = ION_HEAP(MEM_HEAP_ID);
+      alloc_data->heap_id_mask = ION_HEAP(MEM_HEAP_ID);
       alloc_data->flags |= ION_SECURE;
     }
   } else {
 #ifdef MAX_RES_720P
-    alloc_data->heap_mask = ION_HEAP(MEM_HEAP_ID);
+    alloc_data->heap_id_mask = ION_HEAP(MEM_HEAP_ID);
 #else
-    alloc_data->heap_mask = (ION_HEAP(ION_IOMMU_HEAP_ID));
+    alloc_data->heap_id_mask = (ION_HEAP(ION_IOMMU_HEAP_ID));
 #ifdef NO_IOMMU
-      alloc_data->heap_mask |= ION_HEAP(MEM_HEAP_ID);
+      alloc_data->heap_id_mask |= ION_HEAP(MEM_HEAP_ID);
 #endif
 #endif
   }
@@ -8144,9 +8144,9 @@ int omx_vdec::alloc_map_ion_memory(OMX_U32 buffer_size,
   }
 
   DEBUG_PRINT_HIGH("ion_alloc: device_fd = %d, len = %d, align = %d, "
-     "flags = 0x%x, heap_mask = 0x%x, handle = %p, fd = %d", fd,
+     "flags = 0x%x, heap_id_mask = 0x%x, handle = %p, fd = %d", fd,
      alloc_data->len, alloc_data->align, alloc_data->flags,
-     alloc_data->heap_mask, fd_data->handle, fd_data->fd);
+     alloc_data->heap_id_mask, fd_data->handle, fd_data->fd);
   pthread_mutex_unlock(&m_vdec_ionlock);
   return fd;
 
